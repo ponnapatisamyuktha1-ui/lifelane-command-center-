@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#071017"/>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <defs>
+    <radialGradient id="bg" cx="70%" cy="10%" r="70%">
+      <stop offset="0%" stop-color="#144c5b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#071017" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Cross lines forming the LifeLane X mark -->
+  <line x1="156" y1="156" x2="356" y2="356" stroke="#48d7e8" stroke-width="28" stroke-linecap="round"/>
+  <line x1="356" y1="156" x2="156" y2="356" stroke="#48d7e8" stroke-width="28" stroke-linecap="round"/>
+  <!-- Centre diamond -->
+  <rect x="228" y="228" width="56" height="56" rx="6" transform="rotate(45 256 256)" fill="none" stroke="white" stroke-width="14"/>
+  <!-- Ambulance route dot -->
+  <circle cx="256" cy="256" r="14" fill="#48d7e8"/>
+  <!-- Bottom label line hints -->
+  <rect x="192" y="388" width="128" height="8" rx="4" fill="#48d7e8" opacity="0.5"/>
+  <rect x="224" y="404" width="64" height="5" rx="2.5" fill="#48d7e8" opacity="0.25"/>
+</svg>

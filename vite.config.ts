@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
 // =============================================================================
@@ -203,7 +204,90 @@ function vitePluginStorageProxy(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
+const pwaPlugin = VitePWA({
+  registerType: "autoUpdate",
+  // injectRegister injects the SW registration into the built HTML automatically
+  injectRegister: "auto",
+  // workbox config: cache the app shell + static assets, never cache API/Firebase calls
+  workbox: {
+    globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
+    // Do NOT cache dynamic fetch requests (Firebase, API, analytics)
+    navigateFallback: "/index.html",
+    navigateFallbackDenylist: [
+      /^\/api\//,
+      /firestore/,
+      /firebase/,
+      /googleapis/,
+      /\/__manus__/,
+      /\/manus-storage/,
+    ],
+    runtimeCaching: [
+      {
+        // Google Fonts — stale-while-revalidate for stylesheet, cache-first for font files
+        urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+        handler: "StaleWhileRevalidate",
+        options: { cacheName: "google-fonts-stylesheets" },
+      },
+      {
+        urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "google-fonts-webfonts",
+          expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+        },
+      },
+    ],
+  },
+  manifest: {
+    name: "LifeLane Command Center",
+    short_name: "LifeLane",
+    description: "Intelligent Emergency Traffic Management System",
+    theme_color: "#071017",
+    background_color: "#071017",
+    display: "standalone",
+    orientation: "portrait-primary",
+    start_url: "/",
+    scope: "/",
+    id: "lifelane-command-center",
+    icons: [
+      {
+        src: "/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
+    screenshots: [
+      {
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        // @ts-ignore — form_factor is valid in the PWA spec
+        form_factor: "narrow",
+        label: "LifeLane Command Center",
+      },
+    ],
+  },
+  devOptions: {
+    // Enable SW in dev so you can test; set to false to speed up HMR
+    enabled: false,
+    type: "module",
+  },
+});
+
+const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy(), pwaPlugin];
 
 export default defineConfig({
   plugins,
